@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Marilla SOS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body { font-family: Arial; text-align: center; }
+    #map { height: 400px; width: 100%; }
+  </style>
+</head>
+
+<body>
+
+<h2>🚨 SOS Location</h2>
+<div id="map"></div>
+<p id="altitude"></p>
+
+<script>
+function getParams() {
+    let params = new URLSearchParams(window.location.search);
+    return {
+        lat: parseFloat(params.get("lat")),
+        lng: parseFloat(params.get("lng")),
+        alt: params.get("alt")
+    };
+}
+
+function initMap() {
+    let data = getParams();
+
+    if (!data.lat || !data.lng) {
+        alert("Location not found!");
+        return;
+    }
+
+    let pos = { lat: data.lat, lng: data.lng };
+
+    let map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: pos
+    });
+
+    new google.maps.Marker({
+        position: pos,
+        map: map
+    });
+
+    document.getElementById("altitude").innerText =
+        "Altitude: " + data.alt + " meters";
+}
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+
+</body>
+</html>

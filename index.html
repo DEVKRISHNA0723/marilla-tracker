@@ -35,7 +35,7 @@ function getParams() {
 let data = getParams();
 
 if (!data.lat || !data.lng) {
-    document.body.innerHTML = "<h2>No location data received 😢</h2>";
+    document.body.innerHTML = "<h2>No location data 😢</h2>";
 } else {
 
     let map = L.map('map').setView([data.lat, data.lng], 15);

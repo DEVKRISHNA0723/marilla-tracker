@@ -21,37 +21,44 @@
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-function getParams() {
-    let params = new URLSearchParams(window.location.search);
-    return {
-        lat: parseFloat(params.get("lat")),
-        lng: parseFloat(params.get("lng")),
-        alt: params.get("alt")
-    };
+let map = L.map('map').setView([0,0], 15);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+  .addTo(map);
+
+let marker = L.marker([0,0]).addTo(map);
+
+function updateLocation() {
+    fetch("https://api.jsonbin.io/v3/b/69d9300636566621a89c7f87/latest")
+    .then(res => res.json())
+    .then(data => {
+        let loc = data.record;
+
+        if (!loc) return;
+
+        let pos = [loc.lat, loc.lng];
+
+        marker.setLatLng(pos);
+        map.setView(pos);
+
+        document.getElementById("altitude").innerText =
+            "Altitude: " + loc.alt + " m";
+    })
+    .catch(err => console.log(err));
 }
 
-let data = getParams();
+// run immediately
+updateLocation();
 
-if (!data.lat || !data.lng) {
-    document.body.innerHTML = "<h2>No location data 😢</h2>";
-} else {
-
-    let map = L.map('map').setView([data.lat, data.lng], 15);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    L.marker([data.lat, data.lng]).addTo(map)
-        .bindPopup("SOS Location")
-        .openPopup();
-
-    document.getElementById("altitude").innerText =
-        "Altitude: " + data.alt + " meters";
-}
+// update every 5 sec
+setInterval(updateLocation, 5000);
 </script>
+// run immediately
+updateLocation();
 
+// refresh every 5 sec
+setInterval(updateLocation, 5000);
+</script>
 </body>
 </html>

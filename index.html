@@ -4,6 +4,9 @@
   <title>Marilla SOS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
   <style>
     body { font-family: Arial; text-align: center; }
     #map { height: 400px; width: 100%; }
@@ -16,6 +19,9 @@
 <div id="map"></div>
 <p id="altitude"></p>
 
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 function getParams() {
     let params = new URLSearchParams(window.location.search);
@@ -26,32 +32,26 @@ function getParams() {
     };
 }
 
-function initMap() {
-    let data = getParams();
+let data = getParams();
 
-    if (!data.lat || !data.lng) {
-        alert("Location not found!");
-        return;
-    }
+if (!data.lat || !data.lng) {
+    document.body.innerHTML = "<h2>No location data received 😢</h2>";
+} else {
 
-    let pos = { lat: data.lat, lng: data.lng };
+    let map = L.map('map').setView([data.lat, data.lng], 15);
 
-    let map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 15,
-        center: pos
-    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-    new google.maps.Marker({
-        position: pos,
-        map: map
-    });
+    L.marker([data.lat, data.lng]).addTo(map)
+        .bindPopup("SOS Location")
+        .openPopup();
 
     document.getElementById("altitude").innerText =
         "Altitude: " + data.alt + " meters";
 }
 </script>
-
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
 
 </body>
 </html>

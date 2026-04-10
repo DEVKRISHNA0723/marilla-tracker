@@ -30,26 +30,40 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
   .addTo(map);
 
 let marker = L.marker([0,0]).addTo(map);
-
 function updateLocation() {
     fetch("https://api.jsonbin.io/v3/b/69d9300636566621a89c7f87/latest")
     .then(res => res.json())
     .then(data => {
+
         let loc = data.record;
 
         if (!loc) return;
 
+        // 🛑 STOP CONDITION
+        if (loc.status === "STOP") {
+            document.getElementById("altitude").innerText =
+                "🛑 Tracking Stopped";
+            return;
+        }
+
         let pos = [loc.lat, loc.lng];
 
         marker.setLatLng(pos);
-        map.setView(pos);
+        map.panTo(pos);
 
-       let time = new Date(loc.time).toLocaleTimeString();
-       pathCoords.push(pos);
-polyline.setLatLngs(pathCoords);
+        // trail
+        if (pathCoords.length === 0 || 
+            pathCoords[pathCoords.length - 1][0] !== pos[0] ||
+            pathCoords[pathCoords.length - 1][1] !== pos[1]) {
 
-document.getElementById("altitude").innerText =
-    "Altitude: " + loc.alt + " m | Updated: " + time;
+            pathCoords.push(pos);
+            polyline.setLatLngs(pathCoords);
+        }
+
+        let time = new Date(loc.time).toLocaleTimeString();
+
+        document.getElementById("altitude").innerText =
+            "Altitude: " + loc.alt + " m | Updated: " + time;
     })
     .catch(err => console.log(err));
 }
@@ -58,12 +72,6 @@ document.getElementById("altitude").innerText =
 updateLocation();
 
 // update every 5 sec
-setInterval(updateLocation, 5000);
-</script>
-// run immediately
-updateLocation();
-
-// refresh every 5 sec
 setInterval(updateLocation, 5000);
 </script>
 </body>

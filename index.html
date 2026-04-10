@@ -23,6 +23,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 let map = L.map('map').setView([0,0], 15);
+let pathCoords = [];
+let polyline = L.polyline(pathCoords, {color: 'red'}).addTo(map);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
   .addTo(map);
@@ -42,8 +44,12 @@ function updateLocation() {
         marker.setLatLng(pos);
         map.setView(pos);
 
-        document.getElementById("altitude").innerText =
-            "Altitude: " + loc.alt + " m";
+       let time = new Date(loc.time).toLocaleTimeString();
+       pathCoords.push(pos);
+polyline.setLatLngs(pathCoords);
+
+document.getElementById("altitude").innerText =
+    "Altitude: " + loc.alt + " m | Updated: " + time;
     })
     .catch(err => console.log(err));
 }
